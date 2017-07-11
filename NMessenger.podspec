@@ -132,6 +132,8 @@ NMessenger is a fast, lightweight messenger component built on AsyncDisplaykit a
 
   s.requires_arc = true
 
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.2' }
+
   # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  s.dependency "AsyncDisplayKit", "2.1"
+  s.dependency "Texture", "2.3.4"
 end
