@@ -34,7 +34,7 @@ open class ContentNode: ASDisplayNode {
      */
     open var isIncomingMessage = true {
         didSet {
-             self.backgroundBubble?.bubbleColor = isIncomingMessage ? bubbleConfiguration.getIncomingColor() : bubbleConfiguration.getOutgoingColor()
+            self.backgroundBubble?.bubbleColor = isIncomingMessage ? bubbleConfiguration.getIncomingColor() : bubbleConfiguration.getOutgoingColor()
             
             self.setNeedsLayout()
         }
@@ -43,7 +43,7 @@ open class ContentNode: ASDisplayNode {
     // MARK: Initialisers
     /**
      Overriding init to initialise the node
-     */    
+     */
     public init(bubbleConfiguration: BubbleConfigurationProtocol? = nil) {
         if let bubbleConfiguration = bubbleConfiguration {
             self.bubbleConfiguration = bubbleConfiguration
@@ -60,6 +60,7 @@ open class ContentNode: ASDisplayNode {
     override open func didLoad() {
         super.didLoad()
         self.addSublayers()
+        self.isOpaque = false
     }
     
     //MARK: Node Lifecycle helper methods
@@ -93,25 +94,39 @@ open class ContentNode: ASDisplayNode {
             }
         }
     }
-
+    open override func drawParameters(forAsyncLayer layer: _ASDisplayLayer) -> NSObjectProtocol? {
+        return NSDictionary(dictionary: [
+            "bubble": backgroundBubble,
+            "isIncomingMessage": isIncomingMessage
+            ])
+    }
     
     //MARK: Override AsycDisaplyKit Methods
     
     /**
      Draws the content in the bubble. This is called on a background thread.
      */
-    open func drawRect(_ bounds: CGRect, withParameters parameters: NSObjectProtocol!,
-                  isCancelled isCancelledBlock: asdisplaynode_iscancelled_block_t, isRasterizing: Bool) {
-        self.isOpaque = false
+    
+    
+    override open class func draw(_ bounds: CGRect, withParameters parameters: Any?, isCancelled isCancelledBlock: () -> Bool, isRasterizing: Bool) {
+        guard let p = parameters as? [String: Any], let backgroundBubble = p["bubble"] as? Bubble,
+            let isIncomingMessage = p["isIncomingMessage"] as? Bool else { return }
         if !isRasterizing {
-            self.calculateLayerPropertiesThatFit(bounds)
-            
-            //call the main queue
+            backgroundBubble.sizeToBounds(bounds)
             DispatchQueue.main.async {
-                self.layoutLayers()
+                backgroundBubble.createLayer()
+                if isIncomingMessage {
+                    CATransaction.begin()
+                    CATransaction.setDisableActions(true)
+                    backgroundBubble.layer.transform = CATransform3DTranslate(CATransform3DMakeScale(-1, 1, 1), -backgroundBubble.calculatedBounds.width, 0, 0)
+                    backgroundBubble.maskLayer.transform = CATransform3DTranslate(CATransform3DMakeScale(-1, 1, 1), -backgroundBubble.calculatedBounds.width, 0, 0)
+                    CATransaction.commit()
+                }
             }
         }
     }
+    
+    
     
     
     //MARK: Override AsycDisaplyKit helper methods
@@ -122,7 +137,7 @@ open class ContentNode: ASDisplayNode {
      */
     open func calculateLayerPropertiesThatFit(_ bounds: CGRect) {
         if let backgroundBubble = self.backgroundBubble {
-             backgroundBubble.sizeToBounds(bounds)
+            backgroundBubble.sizeToBounds(bounds)
         }
     }
     
@@ -155,7 +170,7 @@ open class ContentNode: ASDisplayNode {
             execute: closure
         )
     }
-
+    
     
     //MARK: UITapGestureRecognizer Selector
     
@@ -165,5 +180,7 @@ open class ContentNode: ASDisplayNode {
      */
     open func messageNodeLongPressSelector(_ recognizer: UITapGestureRecognizer) {
     }
-
+    
 }
+
+
