@@ -71,7 +71,8 @@ open class SpinnerNode: ASDisplayNode {
     }
 
     public override init() {
-        super.init(viewBlock: { UIActivityIndicatorView(activityIndicatorStyle: .gray) }, didLoad: nil)
+        super.init()
+        //super.init(viewBlock: { UIActivityIndicatorView(activityIndicatorStyle: .gray) }, didLoad: nil)
         self.style.preferredSize.height = 32
     }
     
