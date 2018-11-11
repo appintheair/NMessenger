@@ -203,13 +203,19 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
                 self.inputBarBottomSpacing.constant = 0
                 self.isKeyboardIsShown = false
             } else {
-                if self.inputBarBottomSpacing.constant==0{
-                    self.inputBarBottomSpacing.constant -= endFrame?.size.height ?? 0.0
+                let safeAreaInset: CGFloat
+                if #available(iOS 11.0, *) {
+                    safeAreaInset = self.view.safeAreaInsets.bottom
+                } else {
+                    safeAreaInset = 0
+                }
+                if self.inputBarBottomSpacing.constant == 0{
+                    self.inputBarBottomSpacing.constant -= (endFrame?.size.height ?? 0.0) - safeAreaInset
                 }
                 else
                 {
                     self.inputBarBottomSpacing.constant = 0
-                    self.inputBarBottomSpacing.constant -= endFrame?.size.height ?? 0.0
+                    self.inputBarBottomSpacing.constant -= (endFrame?.size.height ?? 0.0) - safeAreaInset
                 }
                 self.isKeyboardIsShown = true
             }
