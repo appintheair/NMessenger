@@ -64,8 +64,7 @@ NMessenger is a fast, lightweight messenger component built on AsyncDisplaykit a
   #  the deployment target. You can optionally include the target after the platform.
   #
 
-  # s.platform     = :ios
-  s.platform     = :ios, "8.2"
+  s.platform     = :ios
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"

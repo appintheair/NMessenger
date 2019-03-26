@@ -96,7 +96,7 @@ open class ContentNode: ASDisplayNode {
     }
     open override func drawParameters(forAsyncLayer layer: _ASDisplayLayer) -> NSObjectProtocol? {
         return NSDictionary(dictionary: [
-            "bubble": backgroundBubble,
+            "bubble": backgroundBubble as Any,
             "isIncomingMessage": isIncomingMessage
             ])
     }
